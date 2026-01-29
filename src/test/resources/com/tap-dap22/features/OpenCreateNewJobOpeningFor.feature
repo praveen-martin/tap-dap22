@@ -859,3 +859,276 @@ Examples:
     Examples:
       | empty |
       |       |
+
+  @tc_verify_create_new_job_opening_form
+  Scenario Outline: Verify Create New Job Opening Form Opens
+    When the user locates the Add Job Opening button
+    And the user clicks on the Add Job Opening button
+    Then the Create New Job Opening form should be displayed
+    And the form should contain fields for job title, description, requirements, and other relevant information
+    And the form should display Save and Cancel buttons
+
+  Examples:
+    | job_title | description | requirements | other_relevant_information |
+    | Example Job Title | Example Description | Example Requirements | Example Other Information |
+
+  @tc_valid_form_submission
+  Scenario Outline: Verify Save Button Enabled with All Required Fields Filled
+    Given the user fills in the job title field with <job_title>
+    And the user fills in the job description field with <job_description>
+    And the user fills in the job requirements field with <job_requirements>
+    When the user ensures all required fields are filled
+    Then the Save button should be enabled
+    And the Cancel button should remain enabled
+
+  Examples:
+    | job_title            | job_description                                                        | job_requirements                                               |
+    | Software Engineer    | Responsible for developing and maintaining software applications.     | Bachelor's degree in Computer Science, 3+ years of experience in software development. |
+
+  Scenario Outline: Clicking the Cancel button
+    When the user clicks the Cancel button in the Create New Job Opening form
+    Then the Create New Job Opening form should be closed
+    And the user should be returned to the Job Opening screen
+
+  Examples:
+    | action                     |
+    | Click on the Cancel button |
+
+  Scenario Outline: Validate empty required fields on form submission
+    When the user leaves the job title field empty
+    And the user leaves the job description field empty
+    And the user leaves the job requirements field empty
+    And the user clicks the Save button
+    Then validation messages should be displayed for the empty job title field
+    And validation messages should be displayed for the empty job description field
+    And validation messages should be displayed for the empty job requirements field
+    And the Save button should remain disabled
+
+  Examples:
+    | job_title | job_description | job_requirements |
+    |           |                  |                   |
+
+  @tc_validation_errors
+  Scenario Outline: Verify retention of data after validation errors
+    When the user fills in the job title field with <job_title>
+    And the user leaves the job description field empty
+    And the user fills in the job requirements field with <job_requirements>
+    And the user clicks the Save button
+    Then the validation messages should be displayed for the empty job description field
+    And the job title field should retain the entered value <job_title>
+    And the job requirements field should retain the entered value <job_requirements>
+
+  Examples:
+    | job_title            | job_requirements                                                                                     |
+    | Software Engineer     | Bachelor's degree in Computer Science, 3 years of experience in software development, proficiency in Java and Python |
+
+  @tc_special_characters_in_title
+  Scenario Outline: Create New Job Opening with Special Characters in Title
+    When the user enters "<job_title>" in the job title field
+    And the user enters "<job_description>" in the job description field
+    And the user enters "<requirements>" in the requirements field
+    And the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with the title "<job_title>"
+
+  Examples:
+    | job_title                | job_description | requirements |
+    | Senior Developer @ XYZ   | a * 100         | a * 100      |
+
+  Scenario Outline: Create Job Opening with Numeric Values in Requirements
+    Given the user enters <job_requirements> in the job requirements field
+    And the user enters <job_title> in the job title field
+    And the user enters <job_description> in the job description field
+    When the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with numeric values in the requirements
+
+    Examples:
+      | job_requirements | job_title          | job_description                                           |
+      | 5                | Software Engineer   | Responsible for developing and maintaining software applications. |
+
+  @tc_multiple_job_requirements
+  Scenario Outline: Create New Job Opening with Multiple Requirements
+    Given the user enters <requirements> in the job requirements field
+    And the user enters <job_title> in the job title field
+    And the user enters <job_description> in the job description field
+    When the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with all job requirements listed
+
+  Examples:
+    | requirements                                      | job_title        | job_description                                         |
+    | 5+ years experience; Proficient in Java; Team player | Software Engineer | Responsible for developing and maintaining software applications. |
+
+  @tc_save_with_optional_fields_empty
+  Scenario Outline: Save Job Opening with Optional Fields Empty
+    When the user enters "<job_title>" in the job title field
+    And the user enters "<job_description>" in the job description field
+    And the user leaves the salary field empty
+    And the user leaves the location field empty
+    And the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with the optional fields left empty
+
+  Examples:
+    | job_title          | job_description                                |
+    | Software Engineer   | Develop and maintain software applications.    |
+
+  @tc_special_characters_in_description
+  Scenario Outline: Create Job Opening with Special Characters in Description
+    Given the user enters <job_description> in the job description field
+    And the user enters <job_title> in the job title field
+    And the user enters <job_requirements> in the job requirements field
+    When the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with special characters in the description
+
+    Examples:
+      | job_description                                           | job_title         | job_requirements                          |
+      | Looking for a developer with experience in C# & .NET   | Software Developer | Must have experience in C#, .NET, and SQL. |
+
+  @tc_leading_trailing_whitespace
+  Scenario Outline: Create Job Opening With Leading and Trailing Whitespace
+    When the user enters "<job_title>" in the job title field
+    And the user enters "<job_description>" in the job description field
+    And the user enters "<job_requirements>" in the job requirements field
+    And the user clicks the Save button
+    Then the form saves successfully without any validation errors
+    And the job opening is created with the job title trimmed of whitespace
+
+  Examples:
+    | job_title            | job_description         | job_requirements         |
+    |  Senior Developer    | Job description a * 100 | Job requirements a * 100 |
+
+  @tc_valid_html_tags
+  Scenario Outline: Create New Job Opening with Valid HTML Tags
+    Given the user enters "<job_description>" in the job description field
+    And the user enters "<job_title>" in the job title field
+    And the user enters "<requirements>" in the requirements field
+    When the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with the HTML tags rendered correctly
+
+  Examples:
+    | job_description                     | job_title          | requirements |
+    | <b>Looking for a developer</b>     | Software Developer  | a * 100      |
+
+  Scenario Outline: Create New Job Opening with Valid Email Format @tc_valid_email_format
+    And the user enters "<job_description>" in the job description field
+    And the user enters "<job_title>" in the job title field
+    And the user enters "<requirements>" in the requirements field
+    When the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with the email format included in the description
+
+  Examples:
+    | job_description                        | job_title        | requirements                                      |
+    | Contact us at hr@example.com          | Software Engineer | Experience with automation testing and CI/CD tools. |
+
+  @tc_validate_save_button_disabled
+  Scenario Outline: Save button is disabled when job title is empty
+    Given the job title field is <job_title>
+    And the user enters <job_description> in the job description field
+    And the user enters <job_requirements> in the job requirements field
+    Then the Save button should be disabled
+    And the Cancel button should remain enabled
+
+  Examples:
+    | job_title | job_description                                                                 | job_requirements                                               |
+    |           | A valid job description that provides a clear overview of the job responsibilities and expectations. | A list of valid job requirements that are necessary for the position. |
+
+  Scenario Outline: Display error message for invalid job title @tc_invalid_job_title
+    When the user enters <job_title> as the job title
+    And the user fills in the job description with <job_description>
+    And the user fills in the job requirements with <job_requirements>
+    And the user clicks the Save button
+    Then the user should see an error message indicating the job title is too short
+    And the Save button should remain disabled
+
+    Examples:
+      | job_title | job_description                                                       | job_requirements                     |
+      | A         | This is a valid job description that meets the requirements.        | These are the valid job requirements. |
+
+  Scenario Outline: Validate Error Message for Invalid Job Description
+    When the user enters a job description that exceeds the maximum character limit
+    And the user enters <job_title> in the job title field
+    And the user enters <requirements> in the requirements field
+    And the user clicks the Save button
+    Then an error message should be displayed indicating the job description exceeds the character limit
+    And the Save button should remain disabled
+
+    Examples:
+      | job_title          | requirements                                                                                     |
+      | Software Engineer   | Bachelor's degree in Computer Science or related field, 3 years of experience in software development, proficiency in Java and Python. |
+
+  Scenario Outline: Display Error Message for Duplicate Job Title
+    When the user enters <job_title> in the job title field
+    And the user enters <job_description> in the job description field
+    And the user enters <requirements> in the requirements field
+    And the user clicks the Save button
+    Then the user should see an error message indicating the job title already exists
+    And the Save button should remain disabled
+
+    Examples:
+      | job_title            | job_description                                   | requirements                                               |
+      | Software Engineer    | Develop and maintain software applications.      | Bachelor's degree in Computer Science or related field, 3 years of experience. |
+
+  Scenario Outline: Validate Error Message for Invalid Job Title Characters
+    When the user enters "<job_title>" in the job title field
+    And the user enters "<job_description>" in the job description field
+    And the user enters "<requirements>" in the requirements field
+    And the user clicks the Save button
+    Then the user should see an error message indicating invalid characters in the job title
+    And the Save button should remain disabled
+
+    Examples:
+      | job_title        | job_description          | requirements            |
+      | Developer #1     | Job description a * 100  | Requirements a * 100     |
+
+  Scenario Outline: Validate error message for job title exceeding character limit
+    When the user enters "<job_title>" in the job title field
+    And the user enters "<job_description>" in the job description field
+    And the user enters "<requirements>" in the requirements field
+    And the user clicks the Save button
+    Then the user should see an error message indicating the job title exceeds the character limit
+    And the Save button should remain disabled
+
+    Examples:
+      | job_title                                                        | job_description                                                                 | requirements                                                                 |
+      | This is a very long job title that exceeds the limit           | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
+
+  @tc_exceed_character_limit
+  Scenario Outline: Validate Error Message for Exceeding Job Requirements Character Limit
+    Given the user enters "<job_title>" in the job title field
+    And the user enters "<job_description>" in the job description field
+    And the user enters "<job_requirements>" in the job requirements field
+    When the user clicks the Save button
+    Then the user should see an error message indicating the job requirements exceed the character limit
+    And the Save button should remain disabled
+
+  Examples:
+    | job_title            | job_description                                                                                     | job_requirements                                                                                      |
+    | Software Engineer     | We are looking for a skilled software engineer with experience in developing applications. | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
+
+  @tc_max_character_limits
+  Scenario Outline: Validate Maximum Character Limits for Job Opening Fields
+    Given the user enters a job title of <job_title> in the job title field
+    And the user enters a job description of <job_description> in the job description field
+    And the user enters job requirements of <job_requirements> in the job requirements field
+    When the user clicks the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with all fields populated to their maximum limits
+
+  Examples:
+    | job_title                                                                                     | job_description                                                                                     | job_requirements                                                                                     |
+    | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
+
+  Scenario Outline: Validate Empty Input Fields
+    When the user leaves all fields empty
+    And the user clicks the Save button
+    Then validation messages should be displayed for all required fields
+    And the Save button should remain disabled
+
+  Examples:
+    | field1 | field2 | field3 |
+    |        |        |        |
