@@ -457,3 +457,284 @@ Feature: OpenCreateNewJobOpeningFor @feature_user_login
   Examples:
     | input_data |
     |            |
+
+@open_job_opening_form
+Scenario Outline: Open Create New Job Opening Form
+  When the user locates the Add Job Opening button
+  And the user clicks on the Add Job Opening button
+  Then the Create New Job Opening form is displayed
+  And the form contains fields for job title, description, requirements, and other relevant information
+  And the form displays Save and Cancel buttons
+
+Examples:
+  |   |
+  |   |
+
+  @valid-job-opening
+  Scenario Outline: Open Create New Job Opening Form
+    Given the user fills in the job title field with "<job_title>"
+    And the user fills in the job description field with "<job_description>"
+    And the user fills in the job requirements field with "<job_requirements>"
+    When all required fields are filled
+    Then the Save button is enabled
+    And the Cancel button remains enabled
+
+    Examples:
+      | job_title               | job_description                                               | job_requirements                                   |
+      | Software Engineer       | Responsible for developing and maintaining software applications. | Bachelor's degree in Computer Science, 3+ years of experience in software development. |
+
+  @cancel_job_opening
+  Scenario Outline: Open Create New Job Opening Form
+    When the user clicks on the Cancel button
+    Then the Create New Job Opening form is closed
+    And the user is returned to the Job Opening screen
+
+    Examples:
+      |   |
+      |   |
+
+  @empty_fields_validation
+  Scenario Outline: Open Create New Job Opening Form
+    Given the job title field is empty
+    And the job description field is empty
+    And the job requirements field is empty
+    When the user clicks the Save button
+    Then validation messages are displayed for the empty job title field
+    And validation messages are displayed for the empty job description field
+    And validation messages are displayed for the empty job requirements field
+    And the Save button remains disabled
+
+    Examples:
+      | job_title | job_description | job_requirements |
+      |           |                  |                   |
+
+  @validation_error_display
+  Scenario Outline: Open Create New Job Opening Form
+    Given I fill in the job title field with "<job_title>"
+    And I leave the job description field empty
+    And I fill in the job requirements field with "<job_requirements>"
+    When I click the Save button
+    Then validation messages are displayed for the empty job description field
+    And the job title field retains the entered value
+    And the job requirements field retains the entered value
+
+    Examples:
+      | job_title           | job_requirements                                                            |
+      | Software Engineer    | Bachelor's degree in Computer Science, 3+ years of experience in software development, proficiency in Java and Python |
+
+@valid-job-opening
+Scenario Outline: Open Create New Job Opening Form
+  When I enter the job title "<job_title>"
+  And I enter the job description "<job_description>"
+  And I enter the requirements "<requirements>"
+  And I click the Save button
+  Then the form should save successfully without any validation errors
+  And the job opening should be created with the special characters in the title
+
+  Examples:
+    | job_title               | job_description | requirements  |
+    | Senior Developer @ XYZ  | a * 100         | a * 100       |
+
+  @valid-numeric-job-requirements
+  Scenario Outline: Open Create New Job Opening Form
+    Given the user enters "<job_requirements>"
+    And the user fills in the job title "<job_title>"
+    And the user fills in the job description "<job_description>"
+    When the user clicks the Save button
+    Then the form saves successfully without any validation errors
+    And the job opening is created with numeric values in the requirements
+
+    Examples:
+      | job_requirements            | job_title          | job_description                                         |
+      | 5 years of experience       | Software Engineer   | Responsible for developing and maintaining software applications. |
+
+  @valid-job-opening
+  Scenario Outline: Open Create New Job Opening Form
+    When I enter "<job_requirements>" in the job requirements field
+    And I fill in the job title as "<job_title>"
+    And I fill in the job description as "<job_description>"
+    And I click the Save button
+    Then the form should save successfully without any validation errors
+    And the job opening should be created with all job requirements listed
+
+    Examples:
+      | job_requirements                       | job_title          | job_description                                             |
+      | 5+ years experience; Proficient in Java; Team player | Software Engineer | Responsible for developing and maintaining software applications. |
+
+  @valid-job-opening
+  Scenario Outline: Open Create New Job Opening Form
+    Given the user fills in the job title with "<job_title>"
+    And the user fills in the job description with "<description>"
+    And the user leaves the salary field empty
+    And the user leaves the location field empty
+    When the user clicks the Save button
+    Then the form saves successfully without any validation errors
+    And the job opening is created with the optional fields left empty
+
+    Examples:
+      | job_title          | description                                    |
+      | Software Engineer   | Develop and maintain software applications.    |
+
+@valid-job-opening
+Scenario Outline: Open Create New Job Opening Form
+  When I enter "<job_description>"
+  And I enter "<job_title>"
+  And I enter "<job_requirements>"
+  And I click the Save button
+  Then the form saves successfully without any validation errors
+  And the job opening is created with special characters in the description
+
+  Examples:
+    | job_description                                        | job_title          | job_requirements                          |
+    | Looking for a developer with experience in C# & .NET | Software Developer  | Must have experience in C#, .NET, and SQL. |
+
+@valid-job-opening
+Scenario Outline: Open Create New Job Opening Form
+  Given the admin enters a job title with leading and trailing whitespace "<job_title>"
+  And the admin enters the job description "<job_description>"
+  And the admin enters the job requirements "<job_requirements>"
+  When the admin clicks the Save button
+  Then the form saves successfully without any validation errors
+
+  Examples:
+    | job_title           | job_description         | job_requirements         |
+    | Senior Developer    | Job description a * 100 | Job requirements a * 100 |
+
+  @valid-job-opening
+  Scenario Outline: Open Create New Job Opening Form
+    Given the user enters a job description "<job_description>"
+    And the user enters the job title "<job_title>"
+    And the user enters the requirements "<requirements>"
+    When the user clicks the Save button
+    Then the form saves successfully without any validation errors
+    And the job opening is created with the HTML tags rendered correctly
+
+    Examples:
+      | job_description                | job_title           | requirements |
+      | <b>Looking for a developer</b> | Software Developer   | a * 100      |
+
+@valid-email-format
+Scenario Outline: Open Create New Job Opening Form
+  Given the user enters "<job_description>"
+  And the user fills in the job title "<job_title>"
+  And the user fills in the requirements "<requirements>"
+  When the user clicks the Save button
+  Then the form saves successfully without any validation errors
+
+  Examples:
+    | job_description                      | job_title         | requirements                                         |
+    | Contact us at hr@example.com        | Software Engineer  | Experience with automation testing and CI/CD tools. |
+
+@validate_save_button_disabled
+Scenario Outline: Open Create New Job Opening Form
+  Given the job title field is empty
+  When I fill in the job description field with "<job_description>"
+  And I fill in the job requirements field with "<job_requirements>"
+  Then the Save button should be disabled
+  And the Cancel button remains enabled
+
+  Examples:
+    | job_description                                                                                       | job_requirements                                          |
+    | A valid job description that provides a clear overview of the job responsibilities and expectations. | A list of valid job requirements that are necessary for the position. |
+
+  @invalid_job_title
+  Scenario Outline: Open Create New Job Opening Form with Invalid Job Title
+    Given the user enters "<job_title>"
+    And the user enters "<job_description>"
+    And the user enters "<job_requirements>"
+    When the user clicks the Save button
+    Then an error message is displayed indicating the job title is too short
+    And the Save button remains disabled
+
+    Examples:
+      | job_title | job_description                                            | job_requirements                        |
+      | A         | This is a valid job description that meets the requirements. | These are the valid job requirements.  |
+
+  @invalid-job_description
+  Scenario Outline: Open Create New Job Opening Form
+    Given I enter a job description that exceeds the maximum character limit
+    When I enter "<job_title>"
+    And I enter "<requirements>"
+    And I click the Save button
+    Then an error message is displayed indicating the job description exceeds the character limit
+    And the Save button remains disabled
+
+    Examples:
+      | job_title          | requirements                                                                                                 |
+      | Software Engineer   | Bachelor's degree in Computer Science or related field, 3+ years of experience in software development, proficiency in Java and Python. |
+
+@duplicate-job-title
+Scenario Outline: Open Create New Job Opening Form
+  Given the user enters "<job_title>"
+  And the user fills in the job description with "<job_description>"
+  And the user fills in the requirements with "<requirements>"
+  When the user clicks the Save button
+  Then an error message is displayed indicating the job title already exists
+  And the Save button remains disabled
+
+  Examples:
+    | job_title          | job_description                           | requirements                                                |
+    | Software Engineer   | Develop and maintain software applications. | Bachelor's degree in Computer Science or related field, 3+ years of experience. |
+
+  @invalid-job-title
+  Scenario Outline: Open Create New Job Opening Form
+    Given the user enters a job title "<job_title>"
+    And the user fills in the job description "<job_description>"
+    And the user fills in the requirements "<requirements>"
+    When the user clicks the Save button
+    Then an error message should be displayed indicating invalid characters in the job title
+    And the Save button remains disabled
+
+    Examples:
+      | job_title     | job_description         | requirements            |
+      | Developer #1  | Job description a * 100 | Requirements a * 100    |
+
+@invalid-job_title_length
+Scenario Outline: Open Create New Job Opening Form
+  Given the user enters a job title "<job_title>"
+  And the user enters a job description "<job_description>"
+  And the user enters the job requirements "<requirements>"
+  When the user clicks the Save button
+  Then an error message is displayed indicating the job title exceeds the character limit
+  And the Save button remains disabled
+
+  Examples:
+    | job_title                                                 | job_description           | requirements            |
+    | This is a very long job title that exceeds the limit    | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
+
+  @invalid-job_requirements
+  Scenario Outline: Open Create New Job Opening Form
+    Given I enter job requirements "<job_requirements>"
+    And I enter job title "<job_title>"
+    And I enter job description "<job_description>"
+    When I click the Save button
+    Then an error message is displayed indicating the job requirements exceed the character limit
+    And the Save button remains disabled
+
+    Examples:
+      | job_requirements                                                                                            | job_title          | job_description                                                                                  |
+      | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | Software Engineer   | We are looking for a skilled software engineer with experience in developing applications.      |
+
+@validate_character_limits
+Scenario Outline: Open Create New Job Opening Form
+  Given the user enters a job title of "<job_title>"
+  And the user enters a job description of "<job_description>"
+  And the user enters job requirements of "<job_requirements>"
+  When the user clicks the Save button
+  Then the form should save successfully without any validation errors
+  And the job opening should be created with all fields populated to their maximum limits
+
+  Examples:
+    | job_title                            | job_description                       | job_requirements                       |
+    | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
+
+  @empty-fields-validation
+  Scenario Outline: Open Create New Job Opening Form with No Input
+    Given the user has left all fields empty
+    When the user clicks the Save button
+    Then validation messages are displayed for all required fields
+    And the Save button remains disabled
+
+    Examples:
+      | field1 | field2 |
+      |        |        |
